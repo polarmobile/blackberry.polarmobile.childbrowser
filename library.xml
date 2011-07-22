@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+	<extension id="blackberry.polarmobile.childbrowser">
+		<entryClass>blackberry.polarmobile.childbrowser.ChildBrowser</entryClass>
+	</extension>
+	<platforms>
+		<platform value="AIR">
+			<target version="default" config="CB" />
+		</platform>
+	</platforms>
+	
+	<configurations>
+		<configuration name="CB" version="1.0" comment="Child Browser implementation">
+			<src type="text/javascript" path="js/common/childbrowser_dispatcher.js" comment="Application JS interface" />
+			<src type="text/javascript" path="js/common/childbrowser_ns.js" comment="Application JS interface" />
+			<src type="text/actionscript" path="src/Air/ChildBrowser/src" comment="ActionScript implementation" />
+		</configuration>
+	</configurations>
+	<features>
+		<feature id="blackberry.polarmobile.childbrowser" version="1.0.0" />
+	</features>
+</library>
