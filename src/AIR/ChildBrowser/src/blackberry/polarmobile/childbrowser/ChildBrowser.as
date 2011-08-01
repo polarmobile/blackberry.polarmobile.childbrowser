@@ -60,6 +60,7 @@ package blackberry.polarmobile.childbrowser
             if (childWebView == null) 
             {
                 childWebView = new QNXStageWebView("ChildBrowser")
+                childWebView.stage = webView.stage
                 childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
             }
 
