@@ -38,6 +38,7 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
 
 ## Known Issues/ TODO
 
+- **does not run on device** (only works in simulator)
 - handling of orientation changes
 - "back" and "forward" not functional
 - "pause" button
@@ -49,8 +50,8 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
 
 - [WebWorks Extension (for PlayBook) Tutorial](http://supportforums.blackberry.com/t5/Web-and-WebWorks-Development/Tutorial-for-Writing-WebWorks-Extension-for-PlayBook/ta-p/1172483)
 
-- Graphics/ Icons... (TODO)
+- Icons by [app-bits](http://www.app-bits.com/free-icons/) (licensed under a Creative Commons Attribution-No Derivative Works 3.0 License)
 
 ## License
 
-This project is distributed under the MIT license. See LICENSE for details.
+The source code for this project is distributed under the MIT license. See LICENSE for details.
