@@ -1,25 +1,25 @@
+/**
+ * Author: Shane Jonas
+ * Child Browser Implimentation for the Playbook
+ */
+
 package blackberry.polarmobile.childbrowser
 {
-
-    import json.JSON;
-
+    // flash
     import flash.geom.Rectangle;
     import flash.display.Stage;
     import flash.events.MouseEvent;
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
 
-    import qnx.locale.LocaleManager;
+    // qnx 
     import qnx.media.QNXStageWebView;
     import qnx.ui.buttons.IconButton;
     import qnx.ui.skins.buttons.OutlineButtonSkinBlack;
 
+    // webworks
     import webworks.extension.DefaultExtension;
 
-    /**
-     * Author: Shane Jonas
-     *
-     */
 
     public class ChildBrowser extends DefaultExtension
     {
@@ -29,14 +29,20 @@ package blackberry.polarmobile.childbrowser
         private var bgshape:Sprite;
         private var browserHeight;
 
+        //icons
         [Embed(source="assets/close.png")] 
         public static var Close:Class;
-
         [Embed(source="assets/refresh.png")] 
         public static var Refresh:Class;
 
-        public function ChildBrowser() {
+        public function ChildBrowser() 
+        {
             super();
+        }
+
+        override public function getFeatureList():Array 
+        {
+            return new Array ("blackberry.polarmobile.childbrowser");
         }
 
         private function initBG()
@@ -47,20 +53,17 @@ package blackberry.polarmobile.childbrowser
             webView.stage.addChildAt(bgshape, 0);
         }
 
-        override public function getFeatureList():Array {
-            return new Array ("blackberry.polarmobile.childbrowser");
-        }
 
         public function loadURL(url:String)
         {
-            browserHeight = webView.stage.stageHeight - 50
+            browserHeight = webView.stage.stageHeight - 50;
             initBG();
 
             //only ever create one web view
             if (childWebView == null) 
             {
-                childWebView = new QNXStageWebView("ChildBrowser")
-                childWebView.stage = webView.stage
+                childWebView = new QNXStageWebView("ChildBrowser");
+                childWebView.stage = webView.stage;
                 childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
             }
 
@@ -75,14 +78,15 @@ package blackberry.polarmobile.childbrowser
           childWebView.loadURL(url);
 
           //build buttons
-          this.initUI()
+          this.initUI();
 
           // events
           webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
 
         }
 
-        private function onOrientationChange(event:StageOrientationEvent){
+        private function onOrientationChange(event:StageOrientationEvent)
+        {
             removeUI();
             initBG();
             initUI();
@@ -149,12 +153,14 @@ package blackberry.polarmobile.childbrowser
           closeButton.setIcon(new Close());
           closeButton.setSize(266, 50);
           closeButton.setPosition(-5, 0);
-          closeButton.setSkin(new OutlineButtonSkinBlack())
+          closeButton.setSkin(new OutlineButtonSkinBlack());
           closeButton.addEventListener(MouseEvent.CLICK, closeCLICK);
           addChild(closeButton);
         }
 
-        private function addRefresh(){
+        //refresh button
+        private function addRefresh()
+        {
           refreshButton = new IconButton();
           refreshButton.setIcon(new Refresh());
           refreshButton.setSize(266, 50);
@@ -165,18 +171,19 @@ package blackberry.polarmobile.childbrowser
         }
 
         // UI Buttons
-        private function initUI(){
-          addClose()
-          addRefresh()
+        private function initUI()
+        {
+          addClose();
+          addRefresh();
         }
 
         // our own addChild implementation
-        // (maps back to stage of WebWorkAppTemplate.as; no explicit typing)
+        // maps back to stage of WebWorkAppTemplate.as
         private function addChild(obj)
         {
           webView.stage.addChild(obj);
           //always set added obj's to top
-          webView.stage.setChildIndex(obj, webView.stage.numChildren -1)
+          webView.stage.setChildIndex(obj, webView.stage.numChildren -1);
         }
 
         private function removeChild(obj)
