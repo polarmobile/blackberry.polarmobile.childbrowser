@@ -38,7 +38,6 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
 
 ## Known Issues/ TODO
 
-- **does not run on device** (only works in simulator)
 - handling of orientation changes
 - "back" and "forward" not functional
 - "pause" button
