@@ -12,6 +12,11 @@
 		return remoteCall.makeSyncCall();
 	}
 
+	function clearCookies(){
+		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/clearCookies");
+		return remoteCall.makeSyncCall();
+	}
+
 	function getLocation(){
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/getLocation");
 		return remoteCall.makeSyncCall();
@@ -41,6 +46,10 @@
 		return loadURL(url);
 	};
 
+	ChildBrowser.prototype.clearCookies = function() {
+		return clearCookies();
+	};
+
 	ChildBrowser.prototype.getLocation = function() {
 		return getLocation();
 	};
@@ -60,6 +69,7 @@
 	ChildBrowser.prototype.close = function() {
 		return close();
 	};
+
 
 	blackberry.Loader.javascriptLoaded("blackberry.polarmobile.childbrowser", ChildBrowser);
 })();

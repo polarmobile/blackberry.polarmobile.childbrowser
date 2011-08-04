@@ -53,6 +53,21 @@ package blackberry.polarmobile.childbrowser
             webView.stage.addChildAt(bgshape, 0);
         }
 
+        public function clearCookies()
+        {
+          //if we dont have a webview, make one and put it in the background
+          if (childWebView == null) 
+          {
+              childWebView = new QNXStageWebView("ChildBrowser");
+              childWebView.stage = webView.stage;
+              childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
+              childWebView.zOrder = -1;
+          }
+          //clear the webviews cookies
+          childWebView.clearCookies();
+          //set to about blank
+          clearWindow();
+        }
 
         public function loadURL(url:String)
         {

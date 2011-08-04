@@ -3,6 +3,7 @@
 	function ChildBrowser(disp) {
 		
 		this.constructor.prototype.loadURL = function(url) { return disp.loadURL(url); };
+		this.constructor.prototype.clearCookies = function() { return disp.clearCookies(); };
 		this.constructor.prototype.back = function() { return disp.back(); };
 		this.constructor.prototype.forward = function() { return disp.forward(); };
 		this.constructor.prototype.refresh = function() { return disp.refresh(); };
