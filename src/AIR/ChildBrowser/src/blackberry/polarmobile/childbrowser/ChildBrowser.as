@@ -11,6 +11,10 @@ package blackberry.polarmobile.childbrowser
     import flash.events.MouseEvent;
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
+    import flash.display.Bitmap;
+    import flash.utils.setTimeout;
+
+    import caurina.transitions.Tweener;
 
     // qnx 
     import qnx.media.QNXStageWebView;
@@ -27,6 +31,7 @@ package blackberry.polarmobile.childbrowser
         private var closeButton:IconButton;
         private var refreshButton:IconButton;
         private var bgshape:Sprite;
+        private var loading_bg_shape:Sprite;
         private var browserHeight;
         private var isVisible:Boolean;
 
@@ -35,6 +40,8 @@ package blackberry.polarmobile.childbrowser
         public static var Close:Class;
         [Embed(source="assets/refresh.png")] 
         public static var Refresh:Class;
+        [Embed(source="assets/ajax-spinner-black-bg.gif")] 
+        public static var Spinner:Class;
 
         public function ChildBrowser() 
         {
@@ -47,12 +54,20 @@ package blackberry.polarmobile.childbrowser
             return new Array ("blackberry.polarmobile.childbrowser");
         }
 
-        private function initBG()
+        private function initBG(callback)
         {
             bgshape = new Sprite();
             bgshape.graphics.beginFill(0x323232);
             bgshape.graphics.drawRect(0,0,webView.stage.stageWidth, webView.stage.stageHeight);
+            bgshape.y = webView.stage.stageHeight
             webView.stage.addChildAt(bgshape, 0);
+
+            Tweener.addTween(bgshape, {
+              y: 0,
+              time: 1,
+              transition: 'easeOutExpo',
+              onComplete: callback
+            });
         }
 
         public function clearCookies()
@@ -73,39 +88,45 @@ package blackberry.polarmobile.childbrowser
 
         public function loadURL(url:String)
         {
+            webView.zOrder = -1;
+            var self = this
             browserHeight = webView.stage.stageHeight - 50;
-            this.initBG();
 
             //only ever create one web view
-            if (childWebView == null) 
-            {
-                childWebView = new QNXStageWebView("ChildBrowser");
-                childWebView.stage = webView.stage;
-                childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
+            function createBrowser(){
+              if (childWebView == null) 
+              {
+                  childWebView = new QNXStageWebView("ChildBrowser");
+                  childWebView.stage = webView.stage;
+                  childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
+              }
+
+              //if its not visible.. i want to see it
+              if (!self.getVisible())
+              {
+                  self.setVisible(true)
+              }
+
+              //load this url
+              childWebView.loadURL(url);
+
+              //build buttons
+              self.initUI();
+
+              // events
+              webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
             }
 
-            //if its not visible.. i want to see it
-            if (!this.getVisible())
-            {
-                this.setVisible(true)
-            }
-
-          //load this url
-          childWebView.loadURL(url);
-
-          //build buttons
-          this.initUI();
-
-          // events
-          webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
-
+            this.initBG(createBrowser);
         }
 
         private function onOrientationChange(event:StageOrientationEvent)
         {
+            var self = this
             this.removeUI();
-            this.initBG();
-            this.initUI();
+            this.initBG(function(){
+              self.initUI()
+            });
             childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
         }
 
@@ -207,6 +228,26 @@ package blackberry.polarmobile.childbrowser
             webView.zOrder = 1;
             childWebView.zOrder = -1;
           }
+        }
+
+        private function addLoadingScreen()
+        {
+          childWebView.zOrder = -1;
+
+          loading_bg_shape = new Sprite();
+          //dark gray for now
+          loading_bg_shape.graphics.beginFill(0x323232);
+          //semi transparent
+          loading_bg_shape.alpha = 0.5;
+          loading_bg_shape.graphics.drawRect(0,0,webView.stage.stageWidth, webView.stage.stageHeight);
+          addChild(loading_bg_shape);
+
+          var loadingSpinner:Bitmap = new Spinner();
+          loadingSpinner.x = webView.stage.stageWidth / 2;
+          loadingSpinner.y = webView.stage.stageHeight / 2;
+
+          addChild(loadingSpinner);
+
         }
 
         // our own addChild implementation
