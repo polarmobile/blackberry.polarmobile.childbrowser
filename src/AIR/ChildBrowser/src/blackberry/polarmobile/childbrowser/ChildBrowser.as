@@ -1,6 +1,6 @@
 /**
  * Author: Shane Jonas
- * Child Browser Implimentation for the Playbook
+ * Child Browser Implementation for the PlayBook
  */
 
 package blackberry.polarmobile.childbrowser
