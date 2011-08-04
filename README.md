@@ -49,7 +49,9 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
 
 ## Acknowledgements
 
-- [WebWorks Extension (for PlayBook) Tutorial](http://supportforums.blackberry.com/t5/Web-and-WebWorks-Development/Tutorial-for-Writing-WebWorks-Extension-for-PlayBook/ta-p/1172483)
+- Special thanks to Adam Stanley ([Twitter](http://twitter.com/n_adam_stanley), [GitHub](http://github.com/adamstanley)) and the WebWorks team for support
+
+- Project shell based on the [WebWorks Extension (for PlayBook) Tutorial](http://supportforums.blackberry.com/t5/Web-and-WebWorks-Development/Tutorial-for-Writing-WebWorks-Extension-for-PlayBook/ta-p/1172483)
 
 - Icons by [app-bits](http://www.app-bits.com/free-icons/) (licensed under a Creative Commons Attribution-No Derivative Works 3.0 License)
 
