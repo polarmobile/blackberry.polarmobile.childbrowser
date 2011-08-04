@@ -41,6 +41,7 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
 - handling of orientation changes
 - "back" and "forward" not functional
 - "pause" button
+- button to re-launch current web page in dedicated browser app
 - progress bar
 - throw event/ trigger callback when loading complete
 - the `close` method currently loads the page `about:blank` and then hides the browser _(when calling the [`dispose` method of QNXStageWebView](http://www.blackberry.com/developers/docs/airapi/1.0.0/qnx/media/QNXStageWebView.html) on our child WebView instance, the main WebWorks WebView is also disposed of)_
