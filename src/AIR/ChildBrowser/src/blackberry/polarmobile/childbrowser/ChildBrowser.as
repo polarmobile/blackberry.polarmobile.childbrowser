@@ -12,8 +12,6 @@ package blackberry.polarmobile.childbrowser
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
 
-    import caurina.transitions.Tweener;
-
     // qnx 
     import qnx.media.QNXStageWebView;
     import qnx.ui.buttons.IconButton;
@@ -29,7 +27,6 @@ package blackberry.polarmobile.childbrowser
         private var closeButton:IconButton;
         private var refreshButton:IconButton;
         private var bgshape:Sprite;
-        private var loading_bg_shape:Sprite;
         private var browserHeight;
         private var isVisible:Boolean;
 
@@ -98,8 +95,6 @@ package blackberry.polarmobile.childbrowser
 
           //build buttons
           this.initUI();
-
-          this.addLoadingScreen();
 
           // events
           webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
