@@ -12,6 +12,8 @@ package blackberry.polarmobile.childbrowser
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
 
+    import caurina.transitions.Tweener;
+
     // qnx 
     import qnx.media.QNXStageWebView;
     import qnx.ui.buttons.IconButton;
@@ -27,7 +29,9 @@ package blackberry.polarmobile.childbrowser
         private var closeButton:IconButton;
         private var refreshButton:IconButton;
         private var bgshape:Sprite;
+        private var loading_bg_shape:Sprite;
         private var browserHeight;
+        private var isVisible:Boolean;
 
         //icons
         [Embed(source="assets/close.png")] 
@@ -38,6 +42,7 @@ package blackberry.polarmobile.childbrowser
         public function ChildBrowser() 
         {
             super();
+            this.isVisible = false
         }
 
         override public function getFeatureList():Array 
@@ -66,13 +71,13 @@ package blackberry.polarmobile.childbrowser
           //clear the webviews cookies
           childWebView.clearCookies();
           //set to about blank
-          clearWindow();
+          this.clearWindow();
         }
 
         public function loadURL(url:String)
         {
             browserHeight = webView.stage.stageHeight - 50;
-            initBG();
+            this.initBG();
 
             //only ever create one web view
             if (childWebView == null) 
@@ -83,10 +88,9 @@ package blackberry.polarmobile.childbrowser
             }
 
             //if its not visible.. i want to see it
-            if (childWebView.zOrder <= 0)
+            if (!this.getVisible())
             {
-                webView.zOrder = -1;
-                childWebView.zOrder = 1;
+                this.setVisible(true)
             }
 
           //load this url
@@ -95,6 +99,8 @@ package blackberry.polarmobile.childbrowser
           //build buttons
           this.initUI();
 
+          this.addLoadingScreen();
+
           // events
           webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
 
@@ -102,9 +108,9 @@ package blackberry.polarmobile.childbrowser
 
         private function onOrientationChange(event:StageOrientationEvent)
         {
-            removeUI();
-            initBG();
-            initUI();
+            this.removeUI();
+            this.initBG();
+            this.initUI();
             childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
         }
 
@@ -138,20 +144,19 @@ package blackberry.polarmobile.childbrowser
           // the `dispose` method does not work when running inside of webworks,
           // as it closes then main `webView` instance. as a temp. work-around,
           // we hide the child
-          childWebView.zOrder = -1;
-          webView.zOrder = 1;
-          clearWindow();
+          this.setVisible(false)
+          this.clearWindow();
         }
 
         public function closeCLICK(e:MouseEvent)
         {
-          close();
-          removeUI();
+          this.close();
+          this.removeUI();
         }
 
         public function refreshCLICK(e:MouseEvent)
         {
-          refresh();
+          this.refresh();
         }
 
         private function removeUI()
@@ -188,8 +193,25 @@ package blackberry.polarmobile.childbrowser
         // UI Buttons
         private function initUI()
         {
-          addClose();
-          addRefresh();
+          this.addClose();
+          this.addRefresh();
+        }
+
+        public function getVisible():Boolean
+        {
+          return this.isVisible; 
+        }
+
+        private function setVisible(arg:Boolean) 
+        {
+          this.isVisible = arg
+          if (arg == true){
+            webView.zOrder = -1;
+            childWebView.zOrder = 1;
+          } else {
+            webView.zOrder = 1;
+            childWebView.zOrder = -1;
+          }
         }
 
         // our own addChild implementation

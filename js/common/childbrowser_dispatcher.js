@@ -22,6 +22,11 @@
 		return remoteCall.makeSyncCall();
 	}
 
+	function getVisible(){
+		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/getVisible");
+		return remoteCall.makeSyncCall();
+	}
+
 	function back(){
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/back");
 		return remoteCall.makeSyncCall();
@@ -52,6 +57,10 @@
 
 	ChildBrowser.prototype.getLocation = function() {
 		return getLocation();
+	};
+
+	ChildBrowser.prototype.getVisible = function() {
+		return getVisible();
 	};
 
 	ChildBrowser.prototype.back = function() {
