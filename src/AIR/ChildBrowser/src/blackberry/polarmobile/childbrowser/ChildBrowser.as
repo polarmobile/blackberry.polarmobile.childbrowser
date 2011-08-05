@@ -11,20 +11,17 @@ package blackberry.polarmobile.childbrowser
     import flash.events.MouseEvent;
     import flash.display.Sprite;
     import flash.events.StageOrientationEvent;
-    import flash.display.Bitmap;
     import flash.utils.setTimeout;
 
     import caurina.transitions.Tweener;
 
     // qnx 
     import qnx.media.QNXStageWebView;
-    import qnx.events.WebViewEvent;
     import qnx.ui.buttons.IconButton;
     import qnx.ui.skins.buttons.OutlineButtonSkinBlack;
 
     // webworks
     import webworks.extension.DefaultExtension;
-
 
     public class ChildBrowser extends DefaultExtension
     {
@@ -91,49 +88,47 @@ package blackberry.polarmobile.childbrowser
         public function clearCookies()
         {
           //if we dont have a webview, make one and put it in the background
+          this.createBrowser()
+          //clear the webviews cookies
+          childWebView.clearCookies();
+          childWebView.stage = null;
+          //childWebView.dispose();
+          //childWebView = null;
+        }
+
+        private function createBrowser()
+        {
           if (childWebView == null) 
           {
               childWebView = new QNXStageWebView("ChildBrowser");
               childWebView.stage = webView.stage;
               childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
               childWebView.zOrder = -1;
+              this.isVisible = true
+              // events
+              webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
           }
-          //clear the webviews cookies
-          childWebView.clearCookies();
-          childWebView.stage = null;
-          childWebView.dispose();
         }
 
         public function loadURL(url:String)
         {
             var self = this;
             browserHeight = webView.stage.stageHeight - 50;
-            //only ever create one web view
-            childWebView = new QNXStageWebView("ChildBrowser");
-            childWebView.zOrder = -100;
+            //if we dont have a webview, make one and put it in the background
+            this.createBrowser();
+            //put webview behind stage
             webView.zOrder = -1;
-            childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
             //load this url
             childWebView.loadURL(url);
-            // events
-            //webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
-            //childWebView.addEventListener(WebViewEvent.DOCUMENT_LOAD_FINISHED, loaded);
             this.initBG();
         }
 
-
         private function onOrientationChange(event:StageOrientationEvent)
         {
-            //var self = this
-            //this.removeUI();
-            //this.initBG()
-            //this.initUI()
-            //childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
-        }
-
-        private function clearWindow()
-        {
-            childWebView.loadURL("about:blank");
+           var self = this
+           this.removeUI();
+           this.initBG()
+           childWebView.viewPort = new Rectangle(0,50,bgshape.width,bgshape.height - 50);
         }
 
         public function getLocation():String
@@ -160,6 +155,7 @@ package blackberry.polarmobile.childbrowser
         {
           childWebView.stage = null;
           childWebView.dispose();
+          childWebView = null;
 
           Tweener.addTween(webViewUI, {
             y: webView.stage.stageHeight,
@@ -234,39 +230,6 @@ package blackberry.polarmobile.childbrowser
         public function getVisible():Boolean
         {
           return this.isVisible; 
-        }
-
-        private function toggleVisible() 
-        {
-          if (this.isVisible  == true){
-            webView.zOrder = -1;
-            childWebView.zOrder = 1;
-            this.isVisible = false
-          } else {
-            webView.zOrder = 1;
-            childWebView.zOrder = -1;
-            this.isVisible = true
-          }
-        }
-
-        private function addLoadingScreen()
-        {
-          childWebView.zOrder = -1;
-
-          loading_bg_shape = new Sprite();
-          //dark gray for now
-          loading_bg_shape.graphics.beginFill(0x323232);
-          //semi transparent
-          loading_bg_shape.alpha = 0.5;
-          loading_bg_shape.graphics.drawRect(0,0,webView.stage.stageWidth, webView.stage.stageHeight);
-          addChild(loading_bg_shape);
-
-          var loadingSpinner:Bitmap = new Spinner();
-          loadingSpinner.x = webView.stage.stageWidth / 2;
-          loadingSpinner.y = webView.stage.stageHeight / 2;
-
-          addChild(loadingSpinner);
-
         }
 
         // our own addChild implementation
