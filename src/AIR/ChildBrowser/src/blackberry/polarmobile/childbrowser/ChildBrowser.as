@@ -18,6 +18,7 @@ package blackberry.polarmobile.childbrowser
 
     // qnx 
     import qnx.media.QNXStageWebView;
+    import qnx.events.WebViewEvent;
     import qnx.ui.buttons.IconButton;
     import qnx.ui.skins.buttons.OutlineButtonSkinBlack;
 
@@ -33,7 +34,9 @@ package blackberry.polarmobile.childbrowser
         private var bgshape:Sprite;
         private var loading_bg_shape:Sprite;
         private var browserHeight;
-        private var isVisible:Boolean;
+        private var isVisible:Boolean = false;
+        private var webViewUI:Sprite;
+
 
         //icons
         [Embed(source="assets/close.png")] 
@@ -54,19 +57,34 @@ package blackberry.polarmobile.childbrowser
             return new Array ("blackberry.polarmobile.childbrowser");
         }
 
-        private function initBG(callback)
+        private function initBG()
         {
+            var self = this;
+            webViewUI = new Sprite();
             bgshape = new Sprite();
             bgshape.graphics.beginFill(0x323232);
             bgshape.graphics.drawRect(0,0,webView.stage.stageWidth, webView.stage.stageHeight);
-            bgshape.y = webView.stage.stageHeight
-            webView.stage.addChildAt(bgshape, 0);
+            webViewUI.addChildAt(bgshape, 0);
 
-            Tweener.addTween(bgshape, {
+            //build buttons
+            this.initUI();
+
+            webViewUI.y = webView.stage.stageHeight;
+            webView.stage.addChild(webViewUI);
+
+            function loaded(){
+              setTimeout(function(){
+                childWebView.stage = webView.stage;
+                childWebView.zOrder = 1;
+                self.isVisible = true;
+              }, 1000);
+            }
+
+            Tweener.addTween(webViewUI, {
               y: 0,
               time: 1,
               transition: 'easeOutExpo',
-              onComplete: callback
+              onComplete: loaded
             });
         }
 
@@ -82,52 +100,35 @@ package blackberry.polarmobile.childbrowser
           }
           //clear the webviews cookies
           childWebView.clearCookies();
-          //set to about blank
-          this.clearWindow();
+          childWebView.stage = null;
+          childWebView.dispose();
         }
 
         public function loadURL(url:String)
         {
-            webView.zOrder = -1;
-            var self = this
+            var self = this;
             browserHeight = webView.stage.stageHeight - 50;
-
             //only ever create one web view
-            function createBrowser(){
-              if (childWebView == null) 
-              {
-                  childWebView = new QNXStageWebView("ChildBrowser");
-                  childWebView.stage = webView.stage;
-                  childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
-              }
-
-              //if its not visible.. i want to see it
-              if (!self.getVisible())
-              {
-                  self.setVisible(true)
-              }
-
-              //load this url
-              childWebView.loadURL(url);
-
-              //build buttons
-              self.initUI();
-
-              // events
-              webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
-            }
-
-            this.initBG(createBrowser);
+            childWebView = new QNXStageWebView("ChildBrowser");
+            childWebView.zOrder = -100;
+            webView.zOrder = -1;
+            childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
+            //load this url
+            childWebView.loadURL(url);
+            // events
+            //webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
+            //childWebView.addEventListener(WebViewEvent.DOCUMENT_LOAD_FINISHED, loaded);
+            this.initBG();
         }
+
 
         private function onOrientationChange(event:StageOrientationEvent)
         {
-            var self = this
-            this.removeUI();
-            this.initBG(function(){
-              self.initUI()
-            });
-            childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
+            //var self = this
+            //this.removeUI();
+            //this.initBG()
+            //this.initUI()
+            //childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
         }
 
         private function clearWindow()
@@ -157,17 +158,32 @@ package blackberry.polarmobile.childbrowser
 
         public function close()
         {
+          childWebView.stage = null;
+          childWebView.dispose();
+
+          Tweener.addTween(webViewUI, {
+            y: webView.stage.stageHeight,
+            delay: 0.5,
+            time: 1,
+            transition: 'easeOutExpo',
+            onComplete: closeUI
+          });
+        }
+
+        private function closeUI()
+        {
           // the `dispose` method does not work when running inside of webworks,
           // as it closes then main `webView` instance. as a temp. work-around,
           // we hide the child
-          this.setVisible(false)
-          this.clearWindow();
+          this.removeUI();
+          webView.stage.removeChild(webViewUI);
+          this.isVisible = false;
+          webView.zOrder = 1;
         }
 
         public function closeCLICK(e:MouseEvent)
         {
           this.close();
-          this.removeUI();
         }
 
         public function refreshCLICK(e:MouseEvent)
@@ -187,8 +203,10 @@ package blackberry.polarmobile.childbrowser
         {
           closeButton = new IconButton();
           closeButton.setIcon(new Close());
+
           closeButton.setSize(266, 50);
           closeButton.setPosition(-5, 0);
+            
           closeButton.setSkin(new OutlineButtonSkinBlack());
           closeButton.addEventListener(MouseEvent.CLICK, closeCLICK);
           addChild(closeButton);
@@ -218,15 +236,16 @@ package blackberry.polarmobile.childbrowser
           return this.isVisible; 
         }
 
-        private function setVisible(arg:Boolean) 
+        private function toggleVisible() 
         {
-          this.isVisible = arg
-          if (arg == true){
+          if (this.isVisible  == true){
             webView.zOrder = -1;
             childWebView.zOrder = 1;
+            this.isVisible = false
           } else {
             webView.zOrder = 1;
             childWebView.zOrder = -1;
+            this.isVisible = true
           }
         }
 
@@ -254,14 +273,14 @@ package blackberry.polarmobile.childbrowser
         // maps back to stage of WebWorkAppTemplate.as
         private function addChild(obj)
         {
-          webView.stage.addChild(obj);
+          webViewUI.addChild(obj);
           //always set added obj's to top
-          webView.stage.setChildIndex(obj, webView.stage.numChildren -1);
+          //webViewUI.setChildIndex(obj, webView.stage.numChildren -1);
         }
 
         private function removeChild(obj)
         {
-          webView.stage.removeChild(obj);
+          webViewUI.removeChild(obj);
         }
 
     }
