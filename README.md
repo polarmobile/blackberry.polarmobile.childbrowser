@@ -33,6 +33,9 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
     // refresh the current page
     browser.refresh();
 
+    // clear all cookies
+    browser.clearCookies();
+
     // automatically close the browser in 10 seconds from now
     setTimeout(function(){ browser.close(); }, 10000);
 
