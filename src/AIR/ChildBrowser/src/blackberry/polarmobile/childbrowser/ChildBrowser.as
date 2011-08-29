@@ -74,11 +74,12 @@ package blackberry.polarmobile.childbrowser
             webViewUI.y = webView.stage.stageHeight;
             webView.stage.addChild(webViewUI);
 
+            self.isVisible = true;
+
             function loaded(){
               setTimeout(function(){
                 childWebView.stage = webView.stage;
                 childWebView.zOrder = 1;
-                self.isVisible = true;
               }, 1000);
             }
 
