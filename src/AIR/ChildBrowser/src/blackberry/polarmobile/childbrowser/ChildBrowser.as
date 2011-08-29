@@ -56,6 +56,11 @@ package blackberry.polarmobile.childbrowser
 
         private function initBG()
         {
+            if (this.isVisible)
+            {
+                return;
+            }
+
             var self = this;
             webViewUI = new Sprite();
             bgshape = new Sprite();
@@ -104,7 +109,6 @@ package blackberry.polarmobile.childbrowser
               childWebView.stage = webView.stage;
               childWebView.viewPort = new Rectangle(0,50,webView.stage.stageWidth,browserHeight);
               childWebView.zOrder = -1;
-              this.isVisible = true
               // events
               webView.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, onOrientationChange);
           }
@@ -173,7 +177,6 @@ package blackberry.polarmobile.childbrowser
           // we hide the child
           this.removeUI();
           webView.stage.removeChild(webViewUI);
-          this.isVisible = false;
           webView.zOrder = 1;
         }
 
@@ -192,6 +195,7 @@ package blackberry.polarmobile.childbrowser
           removeChild(bgshape);
           removeChild(closeButton);
           removeChild(refreshButton)
+          this.isVisible = false;
         }
 
         //close button
