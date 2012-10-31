@@ -39,7 +39,8 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
     // automatically close the browser in 10 seconds from now
     setTimeout(function(){ browser.close(); }, 10000);
 
-### Basic Async Code Version
+### Basic Async Code Sample
+    var browser = blackberry.polarmobile.childbrowser;
     var url = "http://twitter.com/gogibbons";
     browser.loadURLAsync(
         url,
