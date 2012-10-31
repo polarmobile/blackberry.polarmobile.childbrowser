@@ -1,7 +1,9 @@
 (function () {
 
 	var API_URL = "blackberry/polarmobile/childbrowser";
-	var URL_PARAM_NAME = "url"
+	var URL_PARAM_NAME = "url";
+	var EVENT_CHANGE = "onURLChange";
+    var EVENT_EXIT = "onExit";
 
 	function ChildBrowser() {
 	};
@@ -10,7 +12,6 @@
 	{
 		var onURLChangeId = blackberry.events.registerEventHandler(EVENT_CHANGE, onURLChange);
         var onExitId = blackberry.events.registerEventHandler(EVENT_EXIT, onExit);
-
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/loadURLAsync");
 		remoteCall.addParam("url", url);
 		remoteCall.addParam("onURLChange", onURLChangeId);
