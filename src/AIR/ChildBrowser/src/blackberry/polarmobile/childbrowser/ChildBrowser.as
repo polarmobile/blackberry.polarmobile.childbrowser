@@ -15,13 +15,15 @@ package blackberry.polarmobile.childbrowser
 
     import caurina.transitions.Tweener;
 
-    // qnx 
+    // qnx
+    import qnx.events.WebViewEvent;
     import qnx.media.QNXStageWebView;
     import qnx.ui.buttons.IconButton;
     import qnx.ui.skins.buttons.OutlineButtonSkinBlack;
 
     // webworks
     import webworks.extension.DefaultExtension;
+    import webworks.extension.WebWorksReturnValue;
 
     public class ChildBrowser extends DefaultExtension
     {
@@ -33,23 +35,24 @@ package blackberry.polarmobile.childbrowser
         private var browserHeight;
         private var isVisible:Boolean = false;
         private var webViewUI:Sprite;
-
+        private var jsOnURLChange : String = "";
+        private var jsOnExit : String = "";
 
         //icons
-        [Embed(source="assets/close.png")] 
+        [Embed(source="assets/close.png")]
         public static var Close:Class;
-        [Embed(source="assets/refresh.png")] 
+        [Embed(source="assets/refresh.png")]
         public static var Refresh:Class;
-        [Embed(source="assets/ajax-spinner-black-bg.gif")] 
+        [Embed(source="assets/ajax-spinner-black-bg.gif")]
         public static var Spinner:Class;
 
-        public function ChildBrowser() 
+        public function ChildBrowser()
         {
             super();
             this.isVisible = false
         }
 
-        override public function getFeatureList():Array 
+        override public function getFeatureList():Array
         {
             return new Array ("blackberry.polarmobile.childbrowser");
         }
@@ -104,7 +107,7 @@ package blackberry.polarmobile.childbrowser
 
         private function createBrowser()
         {
-          if (childWebView == null) 
+          if (childWebView == null)
           {
               childWebView = new QNXStageWebView("ChildBrowser");
               childWebView.stage = webView.stage;
@@ -126,6 +129,30 @@ package blackberry.polarmobile.childbrowser
             //load this url
             childWebView.loadURL(url);
             this.initBG();
+        }
+
+        public function loadURLAsync(url:String, onURLChange:String, onExit:String) : Object
+        {
+          loadURL(url);
+          var data:Object = {
+            "url" : url,
+            "onURLChange" : onURLChange,
+            "onExit" : onExit
+          };
+          var result:WebWorksReturnValue = new WebWorksReturnValue(data);
+          jsOnURLChange = onURLChange;
+          jsOnExit = onExit;
+
+          childWebView.addEventListener(WebViewEvent.DOCUMENT_LOADED, documentLoaded);
+          return result.jsonObject;
+        }
+
+        private function documentLoaded(e:WebViewEvent):void{
+         evalJavaScriptEvent(jsOnURLChange, [{
+            "code" : 101,
+            "description" :"URL Updated",
+            "data": childWebView.location
+          }]);
         }
 
         private function onOrientationChange(event:StageOrientationEvent)
@@ -169,6 +196,13 @@ package blackberry.polarmobile.childbrowser
             transition: 'easeOutExpo',
             onComplete: closeUI
           });
+          if (jsOnExit != "")
+          {
+            evalJavaScriptEvent(jsOnExit, [{
+              "code" : 100,
+              "description" :"Browser closed"
+            }]);
+          }
         }
 
         private function closeUI()
@@ -207,7 +241,7 @@ package blackberry.polarmobile.childbrowser
 
           closeButton.setSize(266, 50);
           closeButton.setPosition(-5, 0);
-            
+
           closeButton.setSkin(new OutlineButtonSkinBlack());
           closeButton.addEventListener(MouseEvent.CLICK, closeCLICK);
           addChild(closeButton);
@@ -234,7 +268,7 @@ package blackberry.polarmobile.childbrowser
 
         public function getVisible():Boolean
         {
-          return this.isVisible; 
+          return this.isVisible;
         }
 
         // our own addChild implementation
