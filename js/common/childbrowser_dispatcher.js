@@ -1,14 +1,27 @@
 (function () {
 
 	var API_URL = "blackberry/polarmobile/childbrowser";
-	var URL_PARAM_NAME = "url"
-	
+	var URL_PARAM_NAME = "url";
+	var EVENT_CHANGE = "onURLChange";
+    var EVENT_EXIT = "onExit";
+
 	function ChildBrowser() {
 	};
 
+	function loadURLAsync(url, onURLChange, onExit)
+	{
+		var onURLChangeId = blackberry.events.registerEventHandler(EVENT_CHANGE, onURLChange);
+        var onExitId = blackberry.events.registerEventHandler(EVENT_EXIT, onExit);
+		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/loadURLAsync");
+		remoteCall.addParam("url", url);
+		remoteCall.addParam("onURLChange", onURLChangeId);
+		remoteCall.addParam("onExit", onExitId);
+		remoteCall.makeAsyncCall();
+	}
+
 	function loadURL(url){
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/loadURL");
-		remoteCall.addParam(URL_PARAM_NAME, url); 
+		remoteCall.addParam(URL_PARAM_NAME, url);
 		return remoteCall.makeSyncCall();
 	}
 
@@ -46,7 +59,11 @@
 		var remoteCall = new blackberry.transport.RemoteFunctionCall(API_URL + "/close");
 		return remoteCall.makeSyncCall();
 	}
-	
+
+	ChildBrowser.prototype.loadURLAsync = function(url, onURLChange, onExit) {
+		loadURLAsync(url, onURLChange, onExit);
+	};
+
 	ChildBrowser.prototype.loadURL = function(url) {
 		return loadURL(url);
 	};

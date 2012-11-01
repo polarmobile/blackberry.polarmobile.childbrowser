@@ -39,12 +39,62 @@ In the `config.xml` file of your WebWorks app, include the following feature ele
     // automatically close the browser in 10 seconds from now
     setTimeout(function(){ browser.close(); }, 10000);
 
+### Basic Async Code Sample
+    var browser = blackberry.polarmobile.childbrowser;
+    var url = "http://twitter.com/gogibbons";
+    browser.loadURLAsync(
+        url,
+        function (result)
+        {
+            console.log("The current url is: " + result.data);
+        },
+        function ()
+        {
+            console.log("The browser has been closed");
+        });
+
+### Async Code Sample Showing How To Obtain Facebook Credentials
+    var browser = blackberry.polarmobile.childbrowser;
+    var appID = "<insert numeric app ID here>";
+    var redirect = "https://www.facebook.com/connect/login_success.html";
+
+    var path = 'https://www.facebook.com/dialog/oauth?display=wap&scope=publish_actions,read_stream&';
+    var queryParams = ['client_id=' + appID, 'redirect_uri=' + redirect, 'response_type=token'];
+    var query = queryParams.join('&');
+    var url = path + query;
+    var browserIsOpen = true;
+    browser.loadURLAsync(
+        url,  // URL to open in browser
+        function (result){
+            var url = result.data;
+            if (url.substring(0, redirect.length) == redirect)
+            {
+                var fbAccessToken = url.match(/access_token=([^&]+)/)[1];
+                localStorage.setItem('fbAccessToken', fbAccessToken);
+                browserIsOpen = false;
+                browser.close();
+                browser.clearCookies();
+                alert("You authenticated with Facebook");
+            }
+        },
+        function ()
+        {
+            if (browserIsOpen)
+            {
+                alert("You closed the browser before we authenticated you!");
+            }
+        });
+
+
+
+
+
+
 ## Known Issues/ TODO
 
 - "back" and "forward" not functional
 - "pause" button
 - button to re-launch current web page in dedicated browser app
-- throw event/ trigger callback when loading complete
 
 ## Acknowledgements
 
