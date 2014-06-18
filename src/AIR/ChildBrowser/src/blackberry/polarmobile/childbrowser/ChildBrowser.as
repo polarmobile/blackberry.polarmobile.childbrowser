@@ -144,7 +144,25 @@ package blackberry.polarmobile.childbrowser
           jsOnExit = onExit;
 
           childWebView.addEventListener(WebViewEvent.DOCUMENT_LOADED, documentLoaded);
+          childWebView.addEventListener(WebViewEvent.DOCUMENT_LOAD_COMMITTED, documentLoadCommitted);
+          childWebView.addEventListener(WebViewEvent.DOCUMENT_LOAD_FAILED, documentLoadFailed);
           return result.jsonObject;
+        }
+
+        private function documentLoadFailed(e:WebViewEvent):void{
+         evalJavaScriptEvent(jsOnURLChange, [{
+            "code" : 101,
+            "description" :"URL Load Failed",
+            "data": childWebView.location
+          }]);
+        }
+
+        private function documentLoadCommitted(e:WebViewEvent):void{
+         evalJavaScriptEvent(jsOnURLChange, [{
+            "code" : 101,
+            "description" :"URL Load Committed",
+            "data": childWebView.location
+          }]);
         }
 
         private function documentLoaded(e:WebViewEvent):void{
